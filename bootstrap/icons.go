@@ -42,6 +42,8 @@ func (service Provider) Get(name string) string {
 		return service.get("link-45deg")
 	case "loading":
 		return service.get("arrow-clockwise")
+	case "login":
+		return service.get("box-arrow-in-right")
 	case "save":
 		return service.get("check-lg")
 	case "settings":
