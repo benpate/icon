@@ -24,6 +24,8 @@ func (service Provider) Get(name string) string {
 		return service.get("trash")
 	case "edit":
 		return service.get("pencil-square")
+	case "email":
+		return service.get("envelope")
 	case "file":
 		return service.get("file-earmark")
 	case "flag":
