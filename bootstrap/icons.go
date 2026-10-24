@@ -2,10 +2,14 @@ package bootstrap
 
 import (
 	"io"
+
+	"github.com/benpate/derp"
 )
 
+// Provider renders icons from the Bootstrap Icons set
 type Provider struct{}
 
+// Get returns the markup for the named icon, translating common names into their Bootstrap equivalents
 func (service Provider) Get(name string) string {
 	switch name {
 
@@ -84,10 +88,18 @@ func (service Provider) Get(name string) string {
 	}
 }
 
+// get returns the markup for a Bootstrap icon name
 func (service Provider) get(name string) string {
 	return `<i class="bi bi-` + name + `"></i>`
 }
 
+// Write writes the markup for the named icon to the writer
 func (service Provider) Write(name string, writer io.Writer) {
-	writer.Write([]byte(service.Get(name)))
+
+	const location = "bootstrap.Provider.Write"
+
+	// Write has no error to return, so a failed write is reported and then dropped
+	if _, err := writer.Write([]byte(service.Get(name))); err != nil {
+		derp.Report(derp.Wrap(err, location, "Unable to write icon", name))
+	}
 }
