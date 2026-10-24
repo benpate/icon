@@ -14,37 +14,6 @@ import (
 // Provider must keep satisfying the interface that consumers depend on
 var _ icon.Provider = Provider{}
 
-// failingWriter is an io.Writer whose every write fails with its err
-type failingWriter struct {
-	err error
-}
-
-// Write fails without writing anything
-func (writer failingWriter) Write([]byte) (int, error) {
-	return 0, writer.err
-}
-
-// captureReporter records every error that derp reports
-type captureReporter struct {
-	errors *[]error
-}
-
-// Report records the error
-func (reporter captureReporter) Report(err error) {
-	*reporter.errors = append(*reporter.errors, err)
-}
-
-// captureReports routes derp's reports into the returned slice until the test ends
-func captureReports(t *testing.T) *[]error {
-	t.Helper()
-
-	reported := make([]error, 0)
-	derp.SetPlugins(captureReporter{errors: &reported})
-	t.Cleanup(func() { derp.SetPlugins(plugins.JSON{}) })
-
-	return &reported
-}
-
 // TestProvider_Get verifies that every generic name translates to its Bootstrap name
 func TestProvider_Get(t *testing.T) {
 
@@ -150,4 +119,35 @@ func FuzzProvider_Get(f *testing.F) {
 		provider.Write(name, &builder)
 		require.Equal(t, markup, builder.String())
 	})
+}
+
+// captureReports routes derp's reports into the returned slice until the test ends
+func captureReports(t *testing.T) *[]error {
+	t.Helper()
+
+	reported := make([]error, 0)
+	derp.SetPlugins(captureReporter{errors: &reported})
+	t.Cleanup(func() { derp.SetPlugins(plugins.JSON{}) })
+
+	return &reported
+}
+
+// failingWriter is an io.Writer whose every write fails with its err
+type failingWriter struct {
+	err error
+}
+
+// Write fails without writing anything
+func (writer failingWriter) Write([]byte) (int, error) {
+	return 0, writer.err
+}
+
+// captureReporter records every error that derp reports
+type captureReporter struct {
+	errors *[]error
+}
+
+// Report records the error
+func (reporter captureReporter) Report(err error) {
+	*reporter.errors = append(*reporter.errors, err)
 }
